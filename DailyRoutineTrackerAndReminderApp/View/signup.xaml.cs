@@ -30,11 +30,8 @@ namespace DailyRoutineTrackerAndReminderApp.View
 
             try
             {
-                var options = new DbContextOptionsBuilder<DailyRoutineTrackerAndReminderAppDbContext>()
-                    .UseSqlServer("Server=(localdb)\\ProjectModels;Database=DailyRoutineTrackerAndReminderAppDb;Trusted_Connection=True;TrustServerCertificate=True")
-                    .Options;
-
-                using (var context = new DailyRoutineTrackerAndReminderAppDbContext(options))
+                var factory = new DailyRoutineTrackerAndReminderAppDbContextFactory();
+                using (var context = factory.CreateDbContext())
                 {
                     bool userExists = await context.Users.AnyAsync(u => u.Email == email || u.Username == username);
                     if (userExists)
@@ -47,7 +44,7 @@ namespace DailyRoutineTrackerAndReminderApp.View
                     {
                         Email = email,
                         Username = username,
-                        Password = password, // Plain text — not recommended for production
+                        Password = password, // Plain text — consider hashing in production
                         DateJoined = DateTime.Now,
                         ProfileImage = null
                     };
@@ -61,7 +58,7 @@ namespace DailyRoutineTrackerAndReminderApp.View
             }
             catch (Exception ex)
             {
-                MessageBox.Show("An error occurred: " + ex.Message);
+                MessageBox.Show("An error occurred during registration: " + ex.Message);
             }
         }
 

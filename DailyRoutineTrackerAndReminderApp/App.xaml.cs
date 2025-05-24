@@ -1,4 +1,6 @@
 ﻿using System.Windows;
+using DailyRoutineTrackerAndReminderApp.appdbcontext;
+using Microsoft.EntityFrameworkCore;
 
 namespace DailyRoutineTrackerAndReminderApp
 {
@@ -6,11 +8,16 @@ namespace DailyRoutineTrackerAndReminderApp
     {
         protected override void OnStartup(StartupEventArgs e)
         {
+           
+            var dbContext = new DailyRoutineTrackerAndReminderAppDbContextFactory().CreateDbContext();
+
+            dbContext.Database.Migrate();
+
+         
             Window window = new MainWindow();
             window.Show();
 
             base.OnStartup(e);
         }
     }
-
 }
