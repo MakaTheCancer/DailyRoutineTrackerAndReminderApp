@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using DailyRoutineTrackerAndReminderApp.appdbcontext;
-
+using System;
+using System.IO;
 
 namespace DailyRoutineTrackerAndReminderApp.appdbcontext
 {
@@ -9,8 +9,17 @@ namespace DailyRoutineTrackerAndReminderApp.appdbcontext
     {
         public DailyRoutineTrackerAndReminderAppDbContext CreateDbContext(string[] args = null)
         {
+
+            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+            string appFolder = Path.Combine(localAppData, "DailyRoutineTrackerAndReminderApp");
+
+            Directory.CreateDirectory(appFolder);
+       
+            string dbPath = Path.Combine(appFolder, "DailyRoutineTrackerAndReminderApp.db");
+
             var options = new DbContextOptionsBuilder<DailyRoutineTrackerAndReminderAppDbContext>();
-            options.UseSqlServer("Server=(localdb)\\ProjectModels;Database=DailyRoutineTrackerAndReminderAppDb;Trusted_Connection=True;TrustServerCertificate=True");
+            options.UseSqlite($"Data Source={dbPath}");
 
             return new DailyRoutineTrackerAndReminderAppDbContext(options.Options);
         }

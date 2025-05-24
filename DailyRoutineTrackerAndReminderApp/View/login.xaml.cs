@@ -36,11 +36,8 @@ namespace DailyRoutineTrackerAndReminderApp.View
 
             try
             {
-                var options = new DbContextOptionsBuilder<DailyRoutineTrackerAndReminderAppDbContext>()
-                    .UseSqlServer("Server=(localdb)\\ProjectModels;Database=DailyRoutineTrackerAndReminderAppDb;Trusted_Connection=True;TrustServerCertificate=True")
-                    .Options;
-
-                using (var context = new DailyRoutineTrackerAndReminderAppDbContext(options))
+                var factory = new DailyRoutineTrackerAndReminderAppDbContextFactory();
+                using (var context = factory.CreateDbContext())
                 {
                     var user = await context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
 
@@ -64,6 +61,7 @@ namespace DailyRoutineTrackerAndReminderApp.View
             {
                 MessageBox.Show("An error occurred during login: " + ex.Message);
             }
+
         }
 
 
