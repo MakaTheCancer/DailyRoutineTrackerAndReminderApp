@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\alarm.wav" />
     <None Remove="Assets\bellIcon.png" />
     <None Remove="Assets\calendarIcon.png" />
     <None Remove="Assets\DailyRoutineTrackerAndReminderIcon.png" />
@@ -25,6 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Assets\alarm.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Assets\bellIcon.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>

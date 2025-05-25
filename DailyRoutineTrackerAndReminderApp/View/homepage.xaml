@@ -100,13 +100,19 @@
                     <GridView>
                         <GridViewColumn Header="Type" Width="80" DisplayMemberBinding="{Binding Type}" />
                         <GridViewColumn Header="Description" Width="200" DisplayMemberBinding="{Binding Description}" />
-                        <GridViewColumn Header="Date and Time" Width="150" DisplayMemberBinding="{Binding Date, StringFormat=G}" />
+                        <GridViewColumn Header="Date and Time" Width="150">
+                            <GridViewColumn.DisplayMemberBinding>
+                                <Binding Path="Date" StringFormat="{}{0:MMM dd, yyyy hh:mm tt}" />
+                            </GridViewColumn.DisplayMemberBinding>
+                        </GridViewColumn>
                     </GridView>
                 </ListView.View>
             </ListView>
 
             <!-- Create Schedule Button -->
             <Button Content="Create Schedule" Width="150" Height="40" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,290,0,0" Click="ShowSlideUpPanel"/>
+
+            <Grid x:Name="Overlay" Background="Transparent" Visibility="Collapsed" PreviewMouseDown="Overlay_MouseDown"/>
 
             <!-- Slide-up Panel -->
             <Grid x:Name="SlideUpPanel" Background="WhiteSmoke" Height="0" VerticalAlignment="Bottom">
