@@ -1,0 +1,47 @@
+﻿<Window x:Class="DailyRoutineTrackerAndReminderApp.View.DeleteScheduleWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DailyRoutineTrackerAndReminderApp.View"
+        mc:Ignorable="d"
+        Title="DeleteScheduleWindow" Height="450" Width="800">
+
+
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <ListView x:Name="ScheduleListView" Grid.Row="0" SelectionMode="Extended">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Width="50">
+                            <GridViewColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="✓" HorizontalAlignment="Center"/>
+                                </DataTemplate>
+                            </GridViewColumn.HeaderTemplate>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsSelected}" HorizontalAlignment="Center"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="100"/>
+                        <GridViewColumn Header="Description" DisplayMemberBinding="{Binding Description}" Width="200"/>
+                        <GridViewColumn Header="Date and Time" Width="180">
+                            <GridViewColumn.DisplayMemberBinding>
+                                <Binding Path="Date" StringFormat="{}{0:MMM dd, yyyy hh:mm tt}" />
+                            </GridViewColumn.DisplayMemberBinding>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+
+            <Button Grid.Row="1" Content="Delete Selected" Height="30" Width="150" HorizontalAlignment="Right" Click="DeleteSelected_Click" Margin="0,10,0,0"/>
+        </Grid>
+
+
+</Window>

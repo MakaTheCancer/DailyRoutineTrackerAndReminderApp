@@ -20,6 +20,17 @@
                              Storyboard.TargetProperty="Height"
                              To="0" Duration="0:0:0.3" />
         </Storyboard>
+        <Storyboard x:Key="SlideDownSettings">
+            <DoubleAnimation Storyboard.TargetName="SettingsPanel"
+                     Storyboard.TargetProperty="Height"
+                     To="100" Duration="0:0:0.3"/>
+        </Storyboard>
+        <Storyboard x:Key="SlideUpSettings">
+            <DoubleAnimation Storyboard.TargetName="SettingsPanel"
+                     Storyboard.TargetProperty="Height"
+                     To="0" Duration="0:0:0.3"/>
+        </Storyboard>
+
     </Page.Resources>
 
     <Grid>
@@ -109,10 +120,26 @@
                 </ListView.View>
             </ListView>
 
+            <Button Content="Delete Schedule"
+        Width="150"
+        Height="40"
+        VerticalAlignment="Top"
+        HorizontalAlignment="Right"
+        Margin="0,290,60,0"
+        Click="DeleteSchedule_Click"/>
+
             <!-- Create Schedule Button -->
             <Button Content="Create Schedule" Width="150" Height="40" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,290,0,0" Click="ShowSlideUpPanel"/>
 
-            <Grid x:Name="Overlay" Background="Transparent" Visibility="Collapsed" PreviewMouseDown="Overlay_MouseDown"/>
+            <Grid x:Name="SettingsPanel" Background="WhiteSmoke" Height="0" VerticalAlignment="Top">
+                <StackPanel Margin="20">
+                    <TextBlock Text="Settings" FontSize="16" FontWeight="Bold" Margin="0 0 0 10"/>
+                    <Button Content="Delete Account"
+                Background="Red" Foreground="White"
+                Width="150" Height="40"
+                Click="DeleteAccount_Click"/>
+                </StackPanel>
+            </Grid>
 
             <!-- Slide-up Panel -->
             <Grid x:Name="SlideUpPanel" Background="WhiteSmoke" Height="0" VerticalAlignment="Bottom">
@@ -138,37 +165,38 @@
                     <DatePicker x:Name="DatePicker" Margin="0 5"/>
 
 
-                    <!-- Time Picker (only for Alarms) -->
+                    <!-- Time Picker Grid -->
                     <Grid x:Name="TimePickerGrid" Visibility="Collapsed" Margin="0 5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
+                            <!-- Hour -->
                             <ColumnDefinition Width="Auto"/>
+                            <!-- Minute -->
                             <ColumnDefinition Width="Auto"/>
+                            <!-- Second (conditional) -->
                             <ColumnDefinition Width="Auto"/>
+                            <!-- AM/PM -->
                         </Grid.ColumnDefinitions>
 
-                        <!-- Hour ComboBox -->
+                        <!-- Hour -->
                         <StackPanel Grid.Column="0" HorizontalAlignment="Center">
-                            <ComboBox x:Name="HourComboBox" Width="50" Margin="2"
-                  Loaded="HourComboBox_Loaded"/>
+                            <ComboBox x:Name="HourComboBox" Width="50" Margin="2" Loaded="HourComboBox_Loaded"/>
                             <TextBlock Text="Hour" HorizontalAlignment="Center" FontSize="12" Foreground="Gray"/>
                         </StackPanel>
 
-                        <!-- Minute ComboBox -->
+                        <!-- Minute -->
                         <StackPanel Grid.Column="1" HorizontalAlignment="Center">
-                            <ComboBox x:Name="MinuteComboBox" Width="50" Margin="2"
-                  Loaded="MinuteComboBox_Loaded"/>
+                            <ComboBox x:Name="MinuteComboBox" Width="50" Margin="2" Loaded="MinuteComboBox_Loaded"/>
                             <TextBlock Text="Minute" HorizontalAlignment="Center" FontSize="12" Foreground="Gray"/>
                         </StackPanel>
 
-                        <!-- Second ComboBox -->
-                        <StackPanel Grid.Column="2" HorizontalAlignment="Center">
-                            <ComboBox x:Name="SecondComboBox" Width="50" Margin="2"
-                  Loaded="SecondComboBox_Loaded"/>
+                        <!-- Second (only visible for Alarms) -->
+                        <StackPanel x:Name="SecondColumn" Grid.Column="2" HorizontalAlignment="Center" Visibility="Collapsed">
+                            <ComboBox x:Name="SecondComboBox" Width="50" Margin="2" Loaded="SecondComboBox_Loaded"/>
                             <TextBlock Text="Second" HorizontalAlignment="Center" FontSize="12" Foreground="Gray"/>
                         </StackPanel>
 
-                        <!-- AM/PM ComboBox -->
+                        <!-- AM/PM -->
                         <StackPanel Grid.Column="3" HorizontalAlignment="Center">
                             <ComboBox x:Name="AmPmComboBox" Width="60" Margin="2">
                                 <ComboBoxItem Content="AM"/>
@@ -177,6 +205,7 @@
                             <TextBlock Text="AM/PM" HorizontalAlignment="Center" FontSize="12" Foreground="Gray"/>
                         </StackPanel>
                     </Grid>
+
 
 
                     <!-- Save/Cancel Buttons -->

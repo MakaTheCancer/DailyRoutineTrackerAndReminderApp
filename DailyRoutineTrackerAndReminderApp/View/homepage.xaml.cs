@@ -21,6 +21,8 @@ namespace DailyRoutineTrackerAndReminderApp.View
         // Removed MediaPlayer field since we don't use it anymore
         private readonly UserDataService _userDataService = new UserDataService(new DailyRoutineTrackerAndReminderAppDbContextFactory());
         private int userId;
+        private bool isSettingsPanelVisible = false;
+
         public homepage()
         {
             InitializeComponent();
@@ -144,8 +146,20 @@ namespace DailyRoutineTrackerAndReminderApp.View
 
         private void ClickSettings(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("settings");
+            if (!isSettingsPanelVisible)
+            {
+                Storyboard slideDown = (Storyboard)FindResource("SlideDownSettings");
+                slideDown.Begin();
+            }
+            else
+            {
+                Storyboard slideUp = (Storyboard)FindResource("SlideUpSettings");
+                slideUp.Begin();
+            }
+
+            isSettingsPanelVisible = !isSettingsPanelVisible;
         }
+
 
         private async void ClickUploadPfp(object sender, RoutedEventArgs e)
         {
@@ -208,37 +222,48 @@ namespace DailyRoutineTrackerAndReminderApp.View
 
                 if (type == "Alarm")
                 {
+                    // Same as before — includes seconds
                     if (HourComboBox.SelectedItem == null
                         || MinuteComboBox.SelectedItem == null
                         || SecondComboBox.SelectedItem == null
                         || AmPmComboBox.SelectedItem == null)
                     {
-                        MessageBox.Show("Please select a full time (hour, minute, second, AM/PM).");
+                        MessageBox.Show("Please select full time (hour, minute, second, AM/PM).");
                         return;
                     }
 
-                    if (!int.TryParse(HourComboBox.SelectedItem.ToString(), out int hour))
-                    {
-                        MessageBox.Show("Invalid hour format.");
-                        return;
-                    }
-
+                    int hour = int.Parse(HourComboBox.SelectedItem.ToString());
                     int minute = int.Parse(MinuteComboBox.SelectedItem.ToString());
                     int second = int.Parse(SecondComboBox.SelectedItem.ToString());
                     string ampm = (AmPmComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
 
-                    if (ampm == "PM" && hour < 12)
-                        hour += 12;
-                    else if (ampm == "AM" && hour == 12)
-                        hour = 0;
+                    if (ampm == "PM" && hour < 12) hour += 12;
+                    else if (ampm == "AM" && hour == 12) hour = 0;
 
                     TimeSpan time = new TimeSpan(hour, minute, second);
                     scheduleDate = date.Value.Date + time;
                 }
-                else
+                else // Event
                 {
-                    scheduleDate = date.Value.Date;
+                    if (HourComboBox.SelectedItem == null
+                        || MinuteComboBox.SelectedItem == null
+                        || AmPmComboBox.SelectedItem == null)
+                    {
+                        MessageBox.Show("Please select hour, minute, and AM/PM.");
+                        return;
+                    }
+
+                    int hour = int.Parse(HourComboBox.SelectedItem.ToString());
+                    int minute = int.Parse(MinuteComboBox.SelectedItem.ToString());
+                    string ampm = (AmPmComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
+
+                    if (ampm == "PM" && hour < 12) hour += 12;
+                    else if (ampm == "AM" && hour == 12) hour = 0;
+
+                    TimeSpan time = new TimeSpan(hour, minute, 0); // seconds = 0
+                    scheduleDate = date.Value.Date + time;
                 }
+
 
                 // Save to DB
                 using (var context = new DailyRoutineTrackerAndReminderAppDbContextFactory().CreateDbContext())
@@ -281,9 +306,24 @@ namespace DailyRoutineTrackerAndReminderApp.View
             if (TypeComboBox.SelectedItem is ComboBoxItem selectedItem)
             {
                 string selectedType = selectedItem.Content.ToString();
-                TimePickerGrid.Visibility = selectedType == "Alarm" ? Visibility.Visible : Visibility.Collapsed;
+
+                if (selectedType == "Alarm")
+                {
+                    TimePickerGrid.Visibility = Visibility.Visible;
+                    SecondColumn.Visibility = Visibility.Visible;
+                }
+                else if (selectedType == "Event")
+                {
+                    TimePickerGrid.Visibility = Visibility.Visible;
+                    SecondColumn.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    TimePickerGrid.Visibility = Visibility.Collapsed;
+                }
             }
         }
+
 
         private void HourComboBox_Loaded(object sender, RoutedEventArgs e)
         {
@@ -339,5 +379,52 @@ namespace DailyRoutineTrackerAndReminderApp.View
         {
             HideSlideUpPanel(sender, e);
         }
+
+        private void DeleteSchedule_Click(object sender, RoutedEventArgs e)
+        {
+            var deleteWindow = new DeleteScheduleWindow(
+                new DailyRoutineTrackerAndReminderAppDbContextFactory().CreateDbContext(),
+                userId
+            );
+            deleteWindow.ShowDialog();
+
+            _ = LoadSchedulesAsync(); // Refresh list after deletion
+        }
+
+        private async void DeleteAccount_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure you want to delete your account and all schedules?",
+                                         "Confirm Delete",
+                                         MessageBoxButton.YesNo,
+                                         MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    using (var context = new DailyRoutineTrackerAndReminderAppDbContextFactory().CreateDbContext())
+                    {
+                        // Assuming you store user ID in a variable `currentUserId`
+                        var user = await context.Users.FindAsync(userId);
+                        if (user != null)
+                        {
+                            var userSchedules = context.Schedules.Where(s => s.UserId == userId);
+                            context.Schedules.RemoveRange(userSchedules);
+                            context.Users.Remove(user);
+                            await context.SaveChangesAsync();
+                        }
+                    }
+
+                    MessageBox.Show("Account deleted successfully.");
+                    // Navigate to login page or close the app
+                    Services.NavigationService.NavigateTo(new login());
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error deleting account: " + ex.Message);
+                }
+            }
+        }
+
     }
 }
